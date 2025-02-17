@@ -2,6 +2,7 @@ from fastapi import APIRouter, Header, HTTPException, Depends
 from typing import List
 from app.models import SubscriptionRequest, SubscriptionResponse
 from app.database import get_mock_subscriptions
+from app.billing_service import push_billing_data
 
 router = APIRouter(prefix="/ccw/subscriptionmanagement/api/v1.0/sub")
 
@@ -19,3 +20,9 @@ def get_subscription_details(
     if not subscriptions:
         raise HTTPException(status_code=404, detail="No subscriptions found for given IDs")
     return {"subscriptions": subscriptions}
+
+@router.post("/push-billing")
+def push_billing():
+    """Trigger the billing data push to Cloudmore."""
+    push_billing_data()
+    return {"message": "Billing data pushed successfully."}

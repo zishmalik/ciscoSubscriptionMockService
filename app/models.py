@@ -101,3 +101,10 @@ class SubscriptionResponse(BaseModel):
 class SubscriptionRequest(BaseModel):
     bundle: bool
     subscriptionReferenceID: List[str]
+
+class BillingRequest(BaseModel):
+    organizationId: str
+    description: str
+    amount: float
+    currency: str
+    billingPeriod: str

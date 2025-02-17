@@ -5,3 +5,4 @@ tinydb  # Lightweight NoSQL database for test data
 python-dotenv  # For environment variable management
 pytest  # For running tests
 httpx  # For testing FastAPI endpoints
+requests  # For making API calls to Cloudmore
