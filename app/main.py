@@ -5,8 +5,10 @@ from app.database import init_db
 # Initialize FastAPI app
 app = FastAPI(title="Cisco Subscription Mock Service", version="1.0")
 
-# Initialize database
-init_db()
+#Statup datatbase and initalize database
+@app.on_event("startup")
+async def startup_event():
+    init_db()
 
 # Include API routes
 app.include_router(router)
