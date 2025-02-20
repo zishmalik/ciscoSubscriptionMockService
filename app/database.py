@@ -1,29 +1,105 @@
-from tinydb import TinyDB, Query
+from sqlalchemy import create_engine, Column, Integer, String, DECIMAL, TIMESTAMP, ForeignKey
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 import os
-from typing import List, Optional
-from app.models import Subscription, BillingRequest
 
-# Database initialization
-db_path = os.getenv("DATABASE_URL", "tinydb.json")
-db = TinyDB(db_path)
-subscriptions_table = db.table("subscriptions")
-billing_table = db.table("billing")
+# Azure PostgreSQL Connection (Using ciscoSubscription Database)
+DATABASE_URL = f"postgresql://{os.getenv('PGUSER')}:{os.getenv('PGPASSWORD')}@{os.getenv('PGHOST')}:{os.getenv('PGPORT')}/ciscoSubscription"
 
-# Function to retrieve mock subscriptions
-def get_mock_subscriptions(subscription_ids: List[str]) -> List[Subscription]:
-    SubscriptionQuery = Query()
-    results = []
-    for sub_id in subscription_ids:
-        record = subscriptions_table.search(SubscriptionQuery.header.subscriptionReferenceID == sub_id)
-        if record:
-            results.extend(record)
-    return results
+engine = create_engine(DATABASE_URL)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+Base = declarative_base()
 
-# Function to store billing data locally
-def store_billing_data(billing_data: BillingRequest):
-    billing_table.insert(billing_data.dict())
-    return {"message": "Billing data stored successfully."}
+# Subscription Table
+class Subscription(Base):
+    __tablename__ = "subscriptions"
 
-# Function to retrieve all stored billing data
-def get_all_billing_data():
-    return billing_table.all()
+    id = Column(Integer, primary_key=True, index=True)
+    subscription_reference_id = Column(String, unique=True, nullable=False)
+    account_type_code = Column(String(50))
+    adjusted_mrc = Column(DECIMAL(10,2))
+    auto_ren_term = Column(Integer)
+    bill_day = Column(String(20))
+    billing_model = Column(String(50))
+    bundle_line = Column(String(50))
+    currency_code = Column(String(10))
+    days_to_renewal = Column(Integer)
+    organization_id = Column(String, nullable=False)
+    end_date = Column(TIMESTAMP)
+    hosted_offer = Column(String(255))
+    initial_term = Column(Integer)
+    last_update_date = Column(TIMESTAMP)
+    next_true_forward_date = Column(TIMESTAMP)
+    order_activation_date = Column(TIMESTAMP)
+    order_submission_date = Column(TIMESTAMP)
+    over_consumed = Column(String(50))
+    po_number = Column(String(50))
+    prepay_term = Column(Integer)
+    remaining_term = Column(Integer)
+    renewal_date = Column(TIMESTAMP)
+    renewal_term = Column(Integer)
+    so_number = Column(String(50))
+    start_date = Column(TIMESTAMP)
+    status = Column(String(50))
+    tf_consumption_quantity = Column(DECIMAL(10,2))
+    transaction_type = Column(String(50))
+    web_order_id = Column(String(50))
+
+# Subscription List Metadata Table
+class SubscriptionListMetadata(Base):
+    __tablename__ = "subscription_list_metadata"
+
+    id = Column(Integer, primary_key=True, index=True)
+    page = Column(Integer, nullable=False)
+    total_count = Column(Integer, nullable=False)
+    total_pages = Column(Integer, nullable=False)
+    ref_id = Column(String, unique=True, nullable=False)
+
+# Subscription Minor Lines Table
+class SubscriptionMinorLine(Base):
+    __tablename__ = "subscription_minor_lines"
+
+    id = Column(Integer, primary_key=True, index=True)
+    subscription_reference_id = Column(String, ForeignKey("subscriptions.subscription_reference_id"), nullable=False)
+    billing_amount = Column(DECIMAL(10,2))
+    charge_type = Column(String(50))
+    description = Column(String(255))
+    extended_net_price = Column(DECIMAL(10,2))
+    quantity = Column(Integer)
+    unit_list_price = Column(DECIMAL(10,2))
+    unit_net_price = Column(DECIMAL(10,2))
+    usage_type = Column(String(50))
+
+# Subscription Credits Table
+class SubscriptionCredit(Base):
+    __tablename__ = "subscription_credits"
+
+    id = Column(Integer, primary_key=True, index=True)
+    subscription_reference_id = Column(String, ForeignKey("subscriptions.subscription_reference_id"), nullable=False)
+    applicable_at_renewal = Column(String(5))
+    credit_term = Column(Integer)
+    currency = Column(String(10))
+    end_date = Column(TIMESTAMP)
+    monthly_credit_amount = Column(DECIMAL(10,2))
+    credit_name = Column(String(255))
+    start_date = Column(TIMESTAMP)
+
+# Subscription History Table
+class SubscriptionHistory(Base):
+    __tablename__ = "subscription_history"
+
+    id = Column(Integer, primary_key=True, index=True)
+    subscription_reference_id = Column(String, ForeignKey("subscriptions.subscription_reference_id", ondelete="CASCADE"), nullable=False)
+    created_by = Column(String, nullable=True)
+    created_date = Column(TIMESTAMP, nullable=True)
+    transaction_id = Column(String, unique=True, nullable=False)
+    transaction_type = Column(String(50), nullable=True)
+    web_order_id = Column(String(50), nullable=True)
+
+# Initialize Database
+
+def init_db():
+    Base.metadata.create_all(bind=engine)
+
+if __name__ == "__main__":
+    init_db()
