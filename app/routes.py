@@ -42,8 +42,15 @@ def get_subscription_list(
     metadata = db.query(SubscriptionListMetadata).filter_by(ref_id=ref_id).first()
     if not metadata:
         raise HTTPException(status_code=404, detail="Subscription list metadata not found")
+    
     subscriptions = db.query(Subscription).limit(10).offset((page - 1) * 10).all()
-    return {"page": page, "totalCount": metadata.total_count, "totalpages": metadata.total_pages, "refID": ref_id, "subscriptions": subscriptions}
+    return {
+        "page": page,
+        "totalCount": metadata.total_count,
+        "totalpages": metadata.total_pages,
+        "refID": ref_id,
+        "subscriptions": subscriptions
+    }
 
 @router.get("/{subscriptionReferenceId}/history")
 def get_subscription_history(
