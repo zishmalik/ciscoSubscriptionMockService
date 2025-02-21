@@ -40,14 +40,21 @@ def generate_mock_subscriptions(db: Session, count: int = 10):
     db.commit()
 
 def generate_mock_subscription_list_metadata(db: Session):
-    metadata = SubscriptionListMetadata(
-        page=1,
-        total_count=10,
-        total_pages=1,
-        ref_id="mock_ref_id"
-    )
-    db.add(metadata)
-    db.commit()
+    """Ensures metadata exists for subscription listing"""
+    ref_id = "mock123"  # Fixed reference ID
+    existing_metadata = db.query(SubscriptionListMetadata).filter_by(ref_id=ref_id).first()
+    
+    if not existing_metadata:
+        metadata = SubscriptionListMetadata(
+            ref_id=ref_id,
+            total_count=10,
+            total_pages=1
+        )
+        db.add(metadata)
+        db.commit()
+        print(f"✅ Created metadata for ref_id: {ref_id}")
+    else:
+        print(f"🔍 Metadata already exists for ref_id: {ref_id}")
 
 def generate_mock_subscription_history(db: Session, count: int = 5):
     for i in range(count):
