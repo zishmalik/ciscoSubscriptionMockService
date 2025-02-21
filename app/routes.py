@@ -5,6 +5,9 @@ from app.mock_data import populate_mock_data, generate_mock_subscriptions, gener
 from app.models import SubscriptionRequest, SubscriptionResponse
 import random
 
+# Fetch the API key from environment variables
+API_KEY = os.getenv("CISCO_SERVICE_API_KEY", "default-secret-key")
+
 def get_db():
     db = SessionLocal()
     try:
@@ -12,10 +15,11 @@ def get_db():
     finally:
         db.close()
 
-def authenticate_request(request_id: str = Header(...), authorization: str = Header(...)):
-    if not authorization.startswith("Bearer "):
-        raise HTTPException(status_code=401, detail="Unauthorized: Missing or invalid token")
-    return authorization
+def authenticate_request(x_api_key: str = Header(...)):
+    """Check if the provided API key matches the expected value"""
+    if x_api_key != API_KEY:
+        raise HTTPException(status_code=401, detail="Unauthorized: Invalid API Key")
+    return x_api_key
 
 router = APIRouter(prefix="/ccw/subscriptionmanagement/api/v1.0/sub")
 
