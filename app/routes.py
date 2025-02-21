@@ -60,17 +60,15 @@ def generate_mock_data(
     count: int = Body(10, embed=True),
     db: Session = Depends(get_db)
 ):
-    """
-    API endpoint to generate mock data based on predefined scenarios.
-    """
+    if scenario in ["basic", "full"]:
+        generate_mock_subscription_list_metadata(db)  # ✅ Ensure metadata exists
+
     if scenario == "random":
         populate_mock_data(db)
     elif scenario == "basic":
         generate_mock_subscriptions(db, count=5)
-        generate_mock_subscription_list_metadata(db)
     elif scenario == "full":
         generate_mock_subscriptions(db, count=10)
-        generate_mock_subscription_list_metadata(db)
         generate_mock_subscription_history(db, count=5)
     else:
         raise HTTPException(status_code=400, detail="Invalid scenario provided")
