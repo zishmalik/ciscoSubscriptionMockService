@@ -53,6 +53,7 @@ class SubscriptionListMetadata(Base):
     page = Column(Integer, nullable=False)
     total_count = Column(Integer, nullable=False)
     total_pages = Column(Integer, nullable=False)
+    page_limit = Column(Integer, nullable=False)
     ref_id = Column(String, unique=True, nullable=False)
 
 # Subscription Minor Lines Table
