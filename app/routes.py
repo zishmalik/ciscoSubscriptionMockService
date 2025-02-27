@@ -35,19 +35,38 @@ def get_subscription_details(
         raise HTTPException(status_code=404, detail="No subscriptions found for given IDs")
     return {"subscriptions": subscriptions}
 
-@router.get("/subscriptionList")
+@router.post("/subscriptionList")
 def get_subscription_list(
-    page: int, ref_id: str, db: Session = Depends(get_db), auth: str = Depends(authenticate_request)
+    request: dict = Body(...),
+    db: Session = Depends(get_db),
+    auth: str = Depends(authenticate_request)
 ):
+    """
+    Fetch a list of subscriptions based on filters provided in the request body.
+    """
+    # Extracting required parameters from JSON body
+    start_date = request.get("startDate")
+    end_date = request.get("endDate")
+    page = request.get("page", 1)
+    page_limit = request.get("pageLimit", 10)
+    ref_id = request.get("refID")
+
+    if not ref_id:
+        raise HTTPException(status_code=400, detail="Missing required field: refID")
+
+    # Fetch Subscription List Metadata
     metadata = db.query(SubscriptionListMetadata).filter_by(ref_id=ref_id).first()
     if not metadata:
         raise HTTPException(status_code=404, detail="Subscription list metadata not found")
-    
-    subscriptions = db.query(Subscription).limit(10).offset((page - 1) * 10).all()
+
+    # Fetch subscriptions with pagination
+    subscriptions = db.query(Subscription).filter(Subscription.end_date >= start_date, Subscription.end_date <= end_date)\
+        .limit(page_limit).offset((page - 1) * page_limit).all()
+
     return {
         "page": page,
         "totalCount": metadata.total_count,
-        "totalpages": metadata.total_pages,
+        "totalPages": metadata.total_pages,
         "refID": ref_id,
         "subscriptions": subscriptions
     }
