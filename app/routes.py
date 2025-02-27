@@ -35,15 +35,29 @@ def get_subscription_details(
         raise HTTPException(status_code=404, detail="No subscriptions found for given IDs")
     return {"subscriptions": subscriptions}
 
-@router.post("/subscriptionList")
-def get_subscription_list(
-    request: dict = Body(...),
+@router.post("/subscriptionList", response_model=SubscriptionListResponse, tags=["Subscriptions"])
+def post_subscription_list(
+    request: SubscriptionListRequest,
     db: Session = Depends(get_db),
     auth: str = Depends(authenticate_request)
 ):
     """
-    Fetch a list of subscriptions based on filters provided in the request body.
+    **Fetch a list of subscriptions based on filters provided in the request body.**
+    
+    - **startDate (date)**: Start date to filter subscriptions (YYYY-MM-DD).
+    - **endDate (date)**: End date to filter subscriptions (YYYY-MM-DD).
+    - **page (int, optional)**: Page number for pagination (default: 1).
+    - **pageLimit (int, optional)**: Number of results per page (default: 10).
+    - **refID (str)**: Reference ID to fetch subscription metadata.
+    
+    **Response:**
+    - **page**: Current page number.
+    - **totalCount**: Total number of subscriptions.
+    - **totalPages**: Total pages available.
+    - **refID**: Reference ID.
+    - **subscriptions**: List of subscriptions matching the criteria.
     """
+
     # Extracting required parameters from JSON body
     start_date = request.get("startDate")
     end_date = request.get("endDate")
@@ -55,19 +69,21 @@ def get_subscription_list(
         raise HTTPException(status_code=400, detail="Missing required field: refID")
 
     # Fetch Subscription List Metadata
-    metadata = db.query(SubscriptionListMetadata).filter_by(ref_id=ref_id).first()
+    metadata = db.query(SubscriptionListMetadata).filter_by(ref_id=request.refID).first()
     if not metadata:
         raise HTTPException(status_code=404, detail="Subscription list metadata not found")
 
-    # Fetch subscriptions with pagination
-    subscriptions = db.query(Subscription).filter(Subscription.end_date >= start_date, Subscription.end_date <= end_date)\
-        .limit(page_limit).offset((page - 1) * page_limit).all()
+    # ✅ Fetch subscriptions with pagination
+    subscriptions = db.query(Subscription).filter(
+        Subscription.end_date >= request.startDate,
+        Subscription.end_date <= request.endDate
+    ).limit(request.pageLimit).offset((request.page - 1) * request.pageLimit).all()
 
     return {
-        "page": page,
+        "page": request.page,
         "totalCount": metadata.total_count,
         "totalPages": metadata.total_pages,
-        "refID": ref_id,
+        "refID": request.refID,
         "subscriptions": subscriptions
     }
 

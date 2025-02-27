@@ -62,12 +62,21 @@ class SubscriptionRequest(BaseModel):
     bundle: bool
     subscriptionReferenceID: List[str]
 
-class SubscriptionListMetadata(BaseModel):
+# ✅ Define Request Model for subscriptionList
+class SubscriptionListRequest(BaseModel):
+    startDate: date
+    endDate: date
+    page: Optional[int] = 1
+    pageLimit: Optional[int] = 10
+    refID: str
+
+# ✅ Define Response Model for subscriptionList
+class SubscriptionListResponse(BaseModel):
     page: int
     totalCount: int
-    totalpages: int
+    totalPages: int
     refID: str
-    subscriptions: List[Subscription]
+    subscriptions: List[dict]  # You can refine this with a Pydantic model
 
 class SubscriptionHistory(BaseModel):
     createdBy: str
