@@ -1,7 +1,8 @@
 from pydantic import BaseModel
 from typing import List, Optional
-from datetime import datetime
+from datetime import datetime, date
 
+# ✅ Define EndCustomer Model
 class EndCustomer(BaseModel):
     address1: Optional[str]
     address2: Optional[str]
@@ -13,6 +14,7 @@ class EndCustomer(BaseModel):
     postalCode: str
     state: str
 
+# ✅ Define Contact Model
 class Contact(BaseModel):
     email: Optional[str]
     firstName: Optional[str]
@@ -20,6 +22,7 @@ class Contact(BaseModel):
     lastName: Optional[str]
     phone: Optional[str]
 
+# ✅ Define Subscription Header
 class SubscriptionHeader(BaseModel):
     accountTypeCode: str
     adjustedMrc: float
@@ -52,17 +55,20 @@ class SubscriptionHeader(BaseModel):
     webOrderId: Optional[str]
     subscriptionReferenceID: str
 
+# ✅ Subscription Model
 class Subscription(BaseModel):
     header: SubscriptionHeader
 
+# ✅ Subscription Response
 class SubscriptionResponse(BaseModel):
     subscriptions: List[Subscription]
 
+# ✅ Subscription Request
 class SubscriptionRequest(BaseModel):
     bundle: bool
     subscriptionReferenceID: List[str]
 
-# ✅ Define Request Model for subscriptionList
+# ✅ Define Request Model for subscriptionList (Updated to reflect POST request)
 class SubscriptionListRequest(BaseModel):
     startDate: date
     endDate: date
@@ -70,14 +76,25 @@ class SubscriptionListRequest(BaseModel):
     pageLimit: Optional[int] = 10
     refID: str
 
+# ✅ Define Subscription List Item (Explicit Model)
+class SubscriptionListItem(BaseModel):
+    subscriptionReferenceID: str
+    status: str
+    startDate: Optional[datetime]
+    endDate: Optional[datetime]
+    adjustedMrc: float
+    currencyCode: str
+    accountTypeCode: str
+
 # ✅ Define Response Model for subscriptionList
 class SubscriptionListResponse(BaseModel):
     page: int
     totalCount: int
     totalPages: int
     refID: str
-    subscriptions: List[dict]  # You can refine this with a Pydantic model
+    subscriptions: List[SubscriptionListItem]  # Now using a structured model instead of `dict`
 
+# ✅ Subscription History Model
 class SubscriptionHistory(BaseModel):
     createdBy: str
     createdDate: datetime
