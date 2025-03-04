@@ -48,7 +48,7 @@ def generate_mock_subscription_list_metadata(db: Session):
         metadata = SubscriptionListMetadata(
             ref_id=ref_id,
             total_count=10,
-            total_pages=1
+            total_pages=1,
             page_limit=10
         )
         db.add(metadata)
