@@ -2,7 +2,7 @@ from fastapi import APIRouter, Header, HTTPException, Depends, Body
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from typing import Optional, List
-from datetime import date
+from datetime import date, datetime
 import os
 
 from app.database import SessionLocal, Subscription, SubscriptionListMetadata, SubscriptionHistory
