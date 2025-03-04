@@ -7,7 +7,7 @@ import os
 
 from app.database import SessionLocal, Subscription, SubscriptionListMetadata, SubscriptionHistory
 from app.mock_data import populate_mock_data, generate_mock_subscriptions, generate_mock_subscription_list_metadata, generate_mock_subscription_history
-from app.models import SubscriptionRequest, SubscriptionResponse
+from app.models import SubscriptionRequest, SubscriptionResponse, SubscriptionListRequest
 
 # ✅ Fetch the API key from environment variables
 API_KEY = os.getenv("CISCO_SERVICE_API_KEY", "default-secret-key")
