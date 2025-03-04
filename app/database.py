@@ -15,7 +15,7 @@ class Subscription(Base):
     __tablename__ = "subscriptions"
 
     id = Column(Integer, primary_key=True, index=True)
-    subscription_reference_id = Column(String, unique=True, nullable=False)
+    subscription_reference_id = Column(String(255), unique=True, nullable=False)
     account_type_code = Column(String(50))
     adjusted_mrc = Column(DECIMAL(10,2))
     auto_ren_term = Column(Integer)
@@ -53,7 +53,7 @@ class SubscriptionListMetadata(Base):
     page = Column(Integer, nullable=False)
     total_count = Column(Integer, nullable=False)
     total_pages = Column(Integer, nullable=False)
-    page_limit = Column(Integer, nullable=False)
+    page_limit = Column(Integer, nullable=False, default=10)
     ref_id = Column(String, unique=True, nullable=False)
 
 # Subscription Minor Lines Table
