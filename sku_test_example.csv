@@ -1,4 +1,0 @@
-﻿itemCode,name,Description,customer,Max Qty,Count,Price,Cost,MSRP,subscriptionPeriodMonths,Frequency,billingType,billingPeriodType,firstBillingPeriodType,cancelTime,renewalAction
-A-FLEX-MIG,A-FLEX-MIG,Please enter Transfer Code in Quantity Field to th,Broker,281271193,4,12,8,10,M12,M12,recurringBilling,BillingDay,ProRatedBilling,ImmediatelyDelete,AutomaticRenewal
-A-SPK-MIG,A-SPK-MIG,Please enter Transfer Code in Quantity Field to th,Broker,94044681,6,12,8,10,M12,M12,recurringBilling,BillingDay,ProRatedBilling,ImmediatelyDelete,AutomaticRenewal
-A-FLEX-FILESTG-ENT,A-FLEX-FILESTG-ENT,File Storage Entitlement,Broker,55391817,1880,12,8,10,M12,M12,recurringBilling,BillingDay,ProRatedBilling,ImmediatelyDelete,AutomaticRenewal
