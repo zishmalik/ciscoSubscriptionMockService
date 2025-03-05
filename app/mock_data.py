@@ -5,38 +5,43 @@ from datetime import datetime, timedelta
 
 def generate_mock_subscriptions(db: Session, count: int = 10):
     for i in range(count):
-        sub = Subscription(
-            subscription_reference_id=f"SUB{i+1000}",
-            account_type_code="Enterprise",
-            adjusted_mrc=random.uniform(10.0, 500.0),
-            auto_ren_term=random.randint(1, 36),
-            bill_day="15",
-            billing_model="Standard",
-            bundle_line="BundleX",
-            currency_code="USD",
-            days_to_renewal=random.randint(1, 90),
-            organization_id=f"ORG{i+1}",
-            end_date=datetime.utcnow() + timedelta(days=365),
-            hosted_offer="Premium Support",
-            initial_term=12,
-            last_update_date=datetime.utcnow(),
-            next_true_forward_date=datetime.utcnow() + timedelta(days=30),
-            order_activation_date=datetime.utcnow() - timedelta(days=5),
-            order_submission_date=datetime.utcnow() - timedelta(days=10),
-            over_consumed="No",
-            po_number=f"PO-{i+1000}",
-            prepay_term=12,
-            remaining_term=random.randint(1, 12),
-            renewal_date=datetime.utcnow() + timedelta(days=180),
-            renewal_term=12,
-            so_number=f"SO-{i+1000}",
-            start_date=datetime.utcnow() - timedelta(days=30),
-            status="Active",
-            tf_consumption_quantity=random.uniform(1.0, 100.0),
-            transaction_type="New Order",
-            web_order_id=f"WO-{i+1000}"
-        )
-        db.add(sub)
+        ref_id = f"SUB{i+1000}"
+        existing = db.query(Subscription).filter_by(subscription_reference_id=ref_id).first()
+        
+        if not existing:
+            sub = Subscription(
+                subscription_reference_id=ref_id,
+                account_type_code="Enterprise",
+                adjusted_mrc=random.uniform(10.0, 500.0),
+                auto_ren_term=random.randint(1, 36),
+                bill_day="15",
+                billing_model="Standard",
+                bundle_line="BundleX",
+                currency_code="USD",
+                days_to_renewal=random.randint(1, 90),
+                organization_id=f"ORG{i+1}",
+                end_date=datetime.utcnow() + timedelta(days=365),
+                hosted_offer="Premium Support",
+                initial_term=12,
+                last_update_date=datetime.utcnow(),
+                next_true_forward_date=datetime.utcnow() + timedelta(days=30),
+                order_activation_date=datetime.utcnow() - timedelta(days=5),
+                order_submission_date=datetime.utcnow() - timedelta(days=10),
+                over_consumed="No",
+                po_number=f"PO-{i+1000}",
+                prepay_term=12,
+                remaining_term=random.randint(1, 12),
+                renewal_date=datetime.utcnow() + timedelta(days=180),
+                renewal_term=12,
+                so_number=f"SO-{i+1000}",
+                start_date=datetime.utcnow() - timedelta(days=30),
+                status="Active",
+                tf_consumption_quantity=random.uniform(1.0, 100.0),
+                transaction_type="New Order",
+                web_order_id=f"WO-{i+1000}"
+            )
+            db.add(sub)
+    
     db.commit()
 
 def generate_mock_subscription_list_metadata(db: Session):
