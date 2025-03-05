@@ -4,11 +4,12 @@ import random
 from datetime import datetime, timedelta
 
 def generate_mock_subscriptions(db: Session, count: int = 10):
+    existing_ids = {sub.subscription_reference_id for sub in db.query(Subscription.subscription_reference_id).all()}
+
     for i in range(count):
         ref_id = f"SUB{i+1000}"
-        existing = db.query(Subscription).filter_by(subscription_reference_id=ref_id).first()
-        
-        if not existing:
+
+        if ref_id not in existing_ids:  # Only insert if ID doesn't exist
             sub = Subscription(
                 subscription_reference_id=ref_id,
                 account_type_code="Enterprise",
@@ -41,7 +42,7 @@ def generate_mock_subscriptions(db: Session, count: int = 10):
                 web_order_id=f"WO-{i+1000}"
             )
             db.add(sub)
-    
+
     db.commit()
 
 def generate_mock_subscription_list_metadata(db: Session):
@@ -63,9 +64,17 @@ def generate_mock_subscription_list_metadata(db: Session):
         print(f"🔍 Metadata already exists for ref_id: {ref_id}")
 
 def generate_mock_subscription_history(db: Session, count: int = 5):
+    existing_subs = [sub.subscription_reference_id for sub in db.query(Subscription).all()]
+    
+    if not existing_subs:
+        print("⚠️ No subscriptions exist. Skipping history generation.")
+        return
+
     for i in range(count):
+        sub_id = random.choice(existing_subs)  # Pick an existing subscription
+
         history = SubscriptionHistory(
-            subscription_reference_id=f"SUB{random.randint(1000, 1010)}",
+            subscription_reference_id=sub_id,
             created_by="System Admin",
             created_date=datetime.utcnow() - timedelta(days=random.randint(1, 100)),
             transaction_id=f"TXN{random.randint(10000, 99999)}",
@@ -73,6 +82,7 @@ def generate_mock_subscription_history(db: Session, count: int = 5):
             web_order_id=f"WO-{random.randint(1000, 2000)}"
         )
         db.add(history)
+
     db.commit()
 
 def populate_mock_data(db: Session, scenario: str = "random", count: int = 10):
