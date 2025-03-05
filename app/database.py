@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine, Column, Integer, String, DECIMAL, TIMESTAMP, ForeignKey
 from sqlalchemy.orm import sessionmaker, relationship
-from app.orm_models import Base
+from sqlalchemy.ext.declarative import declarative_base
 import os
 
 # Azure PostgreSQL Connection (Using ciscoSubscription Database)

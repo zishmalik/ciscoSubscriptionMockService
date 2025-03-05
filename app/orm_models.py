@@ -1,5 +1,7 @@
 from sqlalchemy import Column, Integer, String
-from app.database import Base  # Ensure you have a Base class from SQLAlchemy
+from sqlalchemy.ext.declarative import declarative_base
+
+Base = declarative_base()  # Ensure you have a Base class from SQLAlchemy
 
 class SubscriptionListMetadata(Base):
     __tablename__ = "subscription_list_metadata"
